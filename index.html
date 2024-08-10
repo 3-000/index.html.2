@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Banking App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div id="loginSection">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <label for="loginUsername">Username:</label>
+                <input type="text" id="loginUsername" name="username" required><br><br>
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword" name="password" required><br><br>
+                <button type="submit">Login</button>
+            </form>
+            <button id="showSignup">Don't have an account? Sign Up</button>
+        </div>
+
+        <div id="signupSection" style="display:none;">
+            <h2>Sign Up</h2>
+            <form id="signupForm">
+                <label for="signupUsername">Username:</label>
+                <input type="text" id="signupUsername" name="username" required><br><br>
+                <label for="signupPassword">Password:</label>
+                <input type="password" id="signupPassword" name="password" required><br><br>
+                <button type="submit">Sign Up</button>
+            </form>
+            <button id="showLogin">Already have an account? Login</button>
+        </div>
+
+        <div id="accountSection" style="display:none;">
+            <h2>Account Balance</h2>
+            <p id="balance"></p>
+
+            <h2>Deposit Funds</h2>
+            <form id="depositForm">
+                <label for="toAccount">To Account:</label>
+                <input type="text" id="toAccount" name="toAccount" required><br><br>
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" name="amount" required><br><br>
+                <button type="submit">Deposit</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('signupSection').style.display = 'none';
+                document.getElementById('accountSection').style.display = 'block';
+                document.getElementById('balance').innerText = `Balance: $${data.balance}`;
+            } else {
+                alert('Login failed');
+            }
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const username = document.getElementById('signupUsername').value;
+            const password = document.getElementById('signupPassword').value;
+
+            const response = await fetch('/api/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                alert('User created successfully. Please log in.');
+                document.getElementById('signupSection').style.display = 'none';
+                document.getElementById('loginSection').style.display = 'block';
+            } else {
+                alert('Sign up failed');
+            }
+        });
+
+        document.getElementById('showSignup').addEventListener('click', function() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('signupSection').style.display = 'block';
+        });
+
+        document.getElementById('showLogin').addEventListener('click', function() {
+            document.getElementById('signupSection').style.display = 'none';
+            document.getElementById('loginSection').style.display = 'block';
+        });
+
+        document.getElementById('depositForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const toAccount = document.getElementById('toAccount').value;
+            const amount = document.getElementById('amount').value;
+
+            const response = await fetch('/api/deposit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ toAccount, amount })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('balance').innerText = `Balance: $${data.balance}`;
+            } else {
+                alert('Deposit failed');
+            }
+        });
+    </script>
+</body>
+</html>
